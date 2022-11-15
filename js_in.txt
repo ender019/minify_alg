@@ -1,0 +1,11 @@
+function logout() {
+	let per = 'var qq'
+        getActiveWidget().logout().then(
+			function() {
+			    console.debug("Session destroyed.");
+			},
+			function(message) {
+			    console.error(message);
+			}
+        );
+    };
