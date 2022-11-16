@@ -1,11 +1,13 @@
-function logout() {
-	let per = 'var qq'
-        getActiveWidget().logout().then(
-			function() {
-			    console.debug("Session destroyed.");
-			},
-			function(message) {
-			    console.error(message);
-			}
-        );
-    };
+var name = "old";
+
+const lastname = "nkb"
+let year = 2020;
+
+console.log(name)
+
+const n = 28
+console.log("name " + name + ", he is "+ n)
+//console.log(n)
+//console.log(n.toString())
+const a = prompt("bvhbvhb")
+alert(a)

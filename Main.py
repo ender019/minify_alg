@@ -7,12 +7,12 @@ class minify_js():
         self.out_file = f2
         self.h = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'     # алфавит для названий
         self.spf = ['const', 'var', 'let', 'this', 'function', 'new', 'class']     # особые имена
-        self.nm = {'\n': '', '\t': ''}     # словарь в котором указано что на что менять
+        self.nm = {}     # словарь в котором указано что на что менять
         self.t = 1     # можно ли что-то менять(созданно для string)
 
     def checking(self, f):     # заполнение имен переменных(nm)
         for line in f:     # идем по строкам
-            ln = re.sub(r'[\'\"].*[\'\"]', '', line)     # убираем string они могут помешать
+            ln = re.sub(r'(?:[\'\"].*[\'\"]|//.*)', '', line)     # убираем string они могут помешать
             pr = re.findall(r'(?:(?:let |var |const |this.)[\d\w]+|\([\d\w]+\))', ln)     # ищем все объявления переменных
             fn = re.findall(r'(?:function|class)(?: [\d\w]+)?\(.*\)', ln)     # ищем все объявления функций
 
@@ -29,7 +29,6 @@ class minify_js():
         i = 0
         q = 52     # букв в алфавите
         for key in self.nm:     # перебираем ключи
-            if key in ['\n', '\t']: continue     # не имена пропускаем
             s = ''     # имя
             n = i
             if i == 0: s = 'a'     # первое имя а
@@ -40,9 +39,9 @@ class minify_js():
             i += 1     # следующий номер
 
     def short(self, s):     # преобразование строки кода
-        out = s
-        for key in self.nm:     # проходим по словарю
-            out = out.replace(key, self.nm[key])     # заменяем старые имена на новые а пробелы и переносы убираем
+        out = re.sub(r'//.*', '', s)
+        out=re.sub(r"\'", '',out)
+        out = re.sub(r"\"", '',out)
 
         ln = out.split(' ')     # делим на команды
         out = ''
@@ -52,7 +51,18 @@ class minify_js():
                 self.t = 0     # не добавлять пробел
             elif re.fullmatch(r"[^\'\"]*[\'\"][^\'\"]*", el) != None:     # string закончился
                 self.t = 1     # добавлять
-            if self.t == 0 or el in self.spf:     # если оператор или string
+            if self.t==1 and el in self.nm.keys():
+                out+=self.nm[el]
+            elif self.t==1 and re.search(r"\(.+\)", el):
+                pr=re.findall(r"\(.+\)",el)[0].split(' ')
+                for i in range(len(pr)):
+                    for key in self.nm.keys():
+                        if key in pr[i]:
+                            pr[i] = re.sub(r"{}".format(key), self.nm[key], pr[i])
+                            break
+                out+=re.sub(r"\(.+\)", ''.join(pr), el)
+
+            elif self.t == 0 or el in self.spf:     # если оператор или string
                 out += el + ' '     # добавить с пробелом
             elif self.t == 1:     # не строка
                 out += el      # без пробела
