@@ -1,3 +1,4 @@
+function just(name, 12 + 4)
 var name = "old";
 
 const lastname = "nkb"

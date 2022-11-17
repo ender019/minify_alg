@@ -13,16 +13,16 @@ class minify_js():
     def checking(self, f):     # заполнение имен переменных(nm)
         for line in f:     # идем по строкам
             ln = re.sub(r'(?:[\'\"].*[\'\"]|//.*)', '', line)     # убираем string они могут помешать
-            pr = re.findall(r'(?:(?:let |var |const |this.)[\d\w]+|\([\d\w]+\))', ln)     # ищем все объявления переменных
-            fn = re.findall(r'(?:function|class)(?: [\d\w]+)?\(.*\)', ln)     # ищем все объявления функций
+            pr = re.findall(r'(?:(?:let |var |const |this.)[\d\w_]+|\([\d\w_]+\))', ln)     # ищем все объявления переменных
+            fn = re.findall(r'(?:function|class)(?: [\d\w_]+)?\(.*\)', ln)     # ищем все объявления функций
 
             for el in pr:     # идем по найденным переменным
-                p = re.findall(r'[\d\w]+', el)     # делим на оператор и имя
+                p = re.findall(r'[\d\w_]+', el)     # делим на оператор и имя
                 for nk in p:     # ищем имя
                     if nk not in self.spf: self.nm[nk] = ''     # если имя записываем
 
             for el in fn:     # теперь для функций
-                p = re.findall(r'[\d\w]+', el)
+                p = re.findall(r'[\d\w_]+', el)
                 for i in range(1, len(p)): self.nm[p[i]] = ''
 
     def naming(self):     # создаем имена
@@ -38,34 +38,31 @@ class minify_js():
             self.nm[key] = s     # новое имя готово
             i += 1     # следующий номер
 
+
+    def func_par(self,m):
+        if ' ' in m[0]:
+            im=m[0].split(' ')
+            im=im[0]+' '+self.nm[im[1]]
+            m[0]=im
+
+        for i in range(1,len(m)):
+            if "'"in m[i] or "\"" in m[i] or m[i]=='': continue
+            m[i]=re.sub(r' ', '', m[i])
+            if m[i] in self.nm.keys(): m[i] = self.nm[m[i]]
+            else:
+                m[i]=eval(m[i])
+        print(m)
+
+
+
     def short(self, s):     # преобразование строки кода
         out = re.sub(r'//.*', '', s)
-        out=re.sub(r"\'", '',out)
-        out = re.sub(r"\"", '',out)
 
-        ln = out.split(' ')     # делим на команды
-        out = ''
-        for el in ln:     # идем по командам
-            if el == '': continue     # пропускаем пустые части
-            if self.t == 1 and re.fullmatch(r"[^\'\"]*[\'\"][^\'\"]*", el) != None:     # если начали объявлять string
-                self.t = 0     # не добавлять пробел
-            elif re.fullmatch(r"[^\'\"]*[\'\"][^\'\"]*", el) != None:     # string закончился
-                self.t = 1     # добавлять
-            if self.t==1 and el in self.nm.keys():
-                out+=self.nm[el]
-            elif self.t==1 and re.search(r"\(.+\)", el):
-                pr=re.findall(r"\(.+\)",el)[0].split(' ')
-                for i in range(len(pr)):
-                    for key in self.nm.keys():
-                        if key in pr[i]:
-                            pr[i] = re.sub(r"{}".format(key), self.nm[key], pr[i])
-                            break
-                out+=re.sub(r"\(.+\)", ''.join(pr), el)
-
-            elif self.t == 0 or el in self.spf:     # если оператор или string
-                out += el + ' '     # добавить с пробелом
-            elif self.t == 1:     # не строка
-                out += el      # без пробела
+        if re.search(r"\(.*\)",out):
+            sp=re.split(r"[\(\)\[\]\{\},\.]",out)
+            self.func_par(sp)
+        else:
+            pass
 
         return out
 
@@ -81,9 +78,9 @@ class minify_js():
             if self.t==1 and len(out) > 0 and out[-1] not in ['(', ',', '{', '}', ';']: out += ';'      # если нужно добавляем
 
         f.close()   # закрываем файл с иходным кодом
-        fl = open(self.out_file, 'w')     # открываем выходной файл
-        fl.write(out)     # записываем новый код
-        fl.close()   # закрываем файл
+        # fl = open(self.out_file, 'w')     # открываем выходной файл
+        # fl.write(out)     # записываем новый код
+        # fl.close()   # закрываем файл
 
 
 minify_js('./js_in.txt', './js_out.txt').main()  # вызов
