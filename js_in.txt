@@ -1,14 +1,66 @@
-function just(name, 12 + 4)
-var name = "old";
+var deg = 0
+var k = 1
 
-const lastname = "nkb"
-let year = 2020;
+function start() {
+    console.log("start")
+    setInterval(tuda, 50)
+    setInterval(cc, 50)
+    $("p span").text("duuucnnnnnnnf")
+}
 
-console.log(name)
+function tuda() {
+    if ($("#pr1").val() == 100) {
+        k = -1
+    } else if ($("#pr1").val() == 0) {
+        k = 1
+    }
+    $("#pr1").val($("#pr1").val() + k)
+}
 
-const n = 28
-console.log("name " + name + ", he is "+ n)
-//console.log(n)
-//console.log(n.toString())
-const a = prompt("bvhbvhb")
-alert(a)
+function cc() {
+    deg += 2
+    $("#im1").css("filter", ("brightness(200%) contrast(200%) saturate(2.5) hue-rotate(" + deg + "deg)"))
+    if (deg == 360) {
+        deg = 0
+    }
+}
+$(function() {
+    $("#i3").on("keyup", function() {
+        $("#p2").text($("#i3").val())
+    })
+    $("#b1").click(function() {
+        confirm("edhjgf")
+    })
+    $(".rb").click(function() {
+        var p = prompt("enter pasword")
+        if (p == "abc123P") {
+            confirm("pasword is True")
+        } else {
+            alert("pasword error!")
+        }
+    })
+    $("#i5").click(function() {
+        if ($("#i4").val()) {
+            var v = $("<li></li>").text($("#i4").val())
+            $("#m2").append(v)
+            $("#i4").val("")
+        }
+    })
+    $("#p1").click(function() {
+        $("#m1").toggle()
+    })
+})
+
+function kon(i) {
+    $(i).css("border-style", "solid")
+    $(i).css("cursor", "pointer")
+}
+
+function kof(i) {
+    $(i).css("border-style", "hidden")
+    $(i).css("cursor", "default")
+}
+
+function ocl(a, b) {
+    alert("hello " + $("#i1").val() + "\n" + $("textarea").val())
+}
