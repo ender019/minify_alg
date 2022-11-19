@@ -41,17 +41,17 @@ class minify_js():
 
 
     def cond_par(self,m):
-        if m[0][-1]==' ':m[0]=m[0][:-1]
-        for i in range(1,len(m)):
-            if m[i]=='': continue
-            if m[i]==' ': continue
-            if not re.search(r"[+*/<>=-]{1,2}", m[i]):
-                if m[i] in self.nm.keys(): m[i] = self.nm[m[i]];
-                continue
-            vz = re.findall(r"[<>=]{1,2}", m[i])[0]
-            vr=re.split(r" [<>=]{1,2} ", m[i])
-            if vr[0] in self.nm.keys(): vr[0]=self.nm[vr[0]]
-            if vr[1] in self.nm.keys(): vr[1]=self.nm[vr[1]]
+        if m[0][-1]==' ':m[0]=m[0][:-1]     # убераем пробел после оператора
+        for i in range(1,len(m)):     # смотримм условия
+            if m[i]=='': continue     # пропускаем пыстые строки
+            if m[i]==' ': continue     #
+            if not re.search(r"[+*/<>=-]{1,2}", m[i]):     # если не выражение
+                if m[i] in self.nm.keys(): m[i] = self.nm[m[i]];      # меняем имя переменной
+                continue  # идем к следующему аргументу
+            vz = re.findall(r"[<>=]{1,2}", m[i])[0]     # ищем операторы
+            vr=re.split(r" [<>=]{1,2} ", m[i])     # разбиваем на части
+            if vr[0] in self.nm.keys(): vr[0]=self.nm[vr[0]]     # меняем имя переменной
+            if vr[1] in self.nm.keys(): vr[1]=self.nm[vr[1]]     # меняем имя переменной
             elif "\'" in m[i] or "\"" in m[i]:  # если строки
                 sa = re.split(r' \+ ', m[i])  # разбираем на части
                 for j in range(len(sa)):  # перебираем ищя переменные
@@ -63,17 +63,17 @@ class minify_js():
                 continue  # идем к следующему аргументу
             else:
                 vr[1] = re.sub(r' ', '', vr[1])  # убираем лишние пробелы
-                sz=re.findall(r"[+*/\(\)-]{1,2}", vr[1])
-                sl=re.split(r"[+*/\(\)-]{1,2}", vr[1])
-                f=1
+                sz=re.findall(r"[+*/\(\)-]{1,2}", vr[1])     # ищем операторы
+                sl=re.split(r"[+*/\(\)-]{1,2}", vr[1])     # разбираем на части
+                f=1     # есть ли изменения
                 for j in range(len(sl)):
-                    if sl[j] in self.nm.keys(): vr[0]=self.nm[sl[j]]; f=0
+                    if sl[j] in self.nm.keys(): vr[0]=self.nm[sl[j]]; f=0     # замена переменных
                 vr[1]=''
                 for j in range(len(sz)):
-                    vr[1] += sl[j]+sz[j]
+                    vr[1] += sl[j]+sz[j]     # сбор врыжения
                 vr[1] += sl[-1]
-                if f: vr[1]=str(eval(vr[1]))
-            m[i]=vr[0]+vz+vr[1]
+                if f: vr[1]=str(eval(vr[1]))     # если выражние арифметическое и без переменных вычисляем
+            m[i]=vr[0]+vz+vr[1]     # обновляем
         return m
 
 
